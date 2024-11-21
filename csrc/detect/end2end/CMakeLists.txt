@@ -23,8 +23,8 @@ message(STATUS "OpenCV Libraries: \n${OpenCV_LIBRARIES}\n")
 message(STATUS "OpenCV Headers: \n${OpenCV_INCLUDE_DIRS}\n")
 
 # TensorRT
-set(TensorRT_INCLUDE_DIRS /usr/include/x86_64-linux-gnu)
-set(TensorRT_LIBRARIES /usr/lib/x86_64-linux-gnu)
+set(TensorRT_INCLUDE_DIRS /home/user/nvidia/TensorRT-8.6.1.6/include)
+set(TensorRT_LIBRARIES /home/user/nvidia/TensorRT-8.6.1.6/lib)
 
 
 message(STATUS "TensorRT Libs: \n${TensorRT_LIBRARIES}\n")
