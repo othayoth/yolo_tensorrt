@@ -59,32 +59,48 @@ int main(int argc, char** argv)
 
     if (isVideo) {
         cv::VideoCapture cap(path);
-        std::cout  << "format " << cap.get(cv::CAP_PROP_FRAME_WIDTH) <<std::endl;
-        if (!IsFile(path)) {
-            printf("Video %s does not exist\n", path.c_str());
-            return -1;
-        }
-        else
-            printf("file exists\n");
+        
         if (!cap.isOpened()) {
             printf("can not open %s\n", path.c_str());
             return -1;
         }
+
+        std::ofstream outputFile("output.csv", std::ios::app);
+        long int frame_num = 0;
         while (cap.read(image)) {
+            frame_num++;
+            
             objs.clear();
             yolov8->copy_from_Mat(image, size);
             auto start = std::chrono::system_clock::now();
             yolov8->infer();
             auto end = std::chrono::system_clock::now();
             yolov8->postprocess(objs);
-            yolov8->draw_objects(image, res, objs, CLASS_NAMES, COLORS);
+            // yolov8->draw_objects(image, res, objs, CLASS_NAMES, COLORS);
             auto tc = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.;
-            printf("cost %2.4lf ms\n", tc);
-            cv::imshow("result", res);
-            if (cv::waitKey(10) == 'q') {
-                break;
+            printf("fps_infer %2.4lf Hz \t t_infer %2.4lf ms\n", 1000.0/tc, tc);
+
+            
+            if (outputFile.is_open()) {
+                for (const auto& obj : objs) {
+
+                    outputFile << frame_num << ","
+                               << obj.label << "," << obj.prob << "," 
+                               << obj.rect.x << "," << obj.rect.y << "," 
+                               << obj.rect.width << "," << obj.rect.height << "\n";
+                }
+                
+            } else {
+                std::cerr << "Unable to open output file";
             }
+
+            // cv::imshow("result", res);
+            // if (cv::waitKey(10) == 'q') {
+            //     break;
+            // }
         }
+
+        outputFile.close();
     }
     else {
         for (auto& path : imagePathList) {

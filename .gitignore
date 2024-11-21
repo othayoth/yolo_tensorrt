@@ -137,3 +137,18 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+
+csrc/detect/end2end/CMakeCache.txt
+csrc/detect/end2end/CMakeFiles/*
+csrc/detect/end2end/build/
+csrc/detect/end2end/Makefile
+csrc/detect/end2end/cmake_install.cmake
+csrc/detect/end2end/Makefile
+csrc/detect/end2end/yolov8
+
+
+
+
+
