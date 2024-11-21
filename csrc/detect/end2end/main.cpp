@@ -4,6 +4,7 @@
 #include "chrono"
 #include "opencv2/opencv.hpp"
 #include "yolov8.hpp"
+#include "tqdm/tqdm.h"
 
 const std::vector<std::string> CLASS_NAMES = {
    "mouse", "ball"};
@@ -16,8 +17,8 @@ int main(int argc, char** argv)
     // cuda:0
     cudaSetDevice(0);
 
-    std::string buildInfo = cv::getBuildInformation();
-    std::cout << buildInfo << std::endl;
+    // std::string buildInfo = cv::getBuildInformation();
+    // std::cout << buildInfo << std::endl;
 
     const std::string engine_file_path{argv[1]};
     const std::string path{argv[2]};
@@ -59,15 +60,22 @@ int main(int argc, char** argv)
 
     if (isVideo) {
         cv::VideoCapture cap(path);
+
+        int total_frames = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_COUNT));
+        printf("Total number of frames: %d\n", total_frames);
         
         if (!cap.isOpened()) {
             printf("can not open %s\n", path.c_str());
             return -1;
         }
 
-        std::ofstream outputFile("output.csv", std::ios::app);
+        std::string csv_path = path.substr(0, path.find_last_of('.')) + "_trt_track.csv";
+        std::ofstream outputFile(csv_path, std::ios::app);
         long int frame_num = 0;
-        while (cap.read(image)) {
+        // while (cap.read(image)) {
+        for (int i : tqdm::range(total_frames)) 
+        {   
+            cap.read(image);
             frame_num++;
             
             objs.clear();
@@ -78,7 +86,7 @@ int main(int argc, char** argv)
             yolov8->postprocess(objs);
             // yolov8->draw_objects(image, res, objs, CLASS_NAMES, COLORS);
             auto tc = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.;
-            printf("fps_infer %2.4lf Hz \t t_infer %2.4lf ms\n", 1000.0/tc, tc);
+            printf(" -- fps_infer %2.4lf Hz \t t_infer %2.4lf ms\n", 1000.0/tc, tc);
 
             
             if (outputFile.is_open()) {
