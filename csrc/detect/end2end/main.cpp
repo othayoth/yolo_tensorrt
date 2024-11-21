@@ -70,37 +70,38 @@ int main(int argc, char** argv)
         }
 
         std::string csv_path = path.substr(0, path.find_last_of('.')) + "_trt_track.csv";
-        std::ofstream outputFile(csv_path, std::ios::app);
+        std::ofstream outputFile(csv_path, std::ios::trunc);
+
         long int frame_num = 0;
         // while (cap.read(image)) {
         for (int i : tqdm::range(total_frames)) 
         {   
+            auto start = std::chrono::system_clock::now();
+
             cap.read(image);
             frame_num++;
             
             objs.clear();
             yolov8->copy_from_Mat(image, size);
-            auto start = std::chrono::system_clock::now();
-            yolov8->infer();
-            auto end = std::chrono::system_clock::now();
+            
+            yolov8->infer();            
             yolov8->postprocess(objs);
             // yolov8->draw_objects(image, res, objs, CLASS_NAMES, COLORS);
-            auto tc = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.;
-            printf(" -- fps_infer %2.4lf Hz \t t_infer %2.4lf ms\n", 1000.0/tc, tc);
+            
 
             
-            if (outputFile.is_open()) {
-                for (const auto& obj : objs) {
+            
+            for (const auto& obj : objs) {
 
-                    outputFile << frame_num << ","
-                               << obj.label << "," << obj.prob << "," 
-                               << obj.rect.x << "," << obj.rect.y << "," 
-                               << obj.rect.width << "," << obj.rect.height << "\n";
-                }
-                
-            } else {
-                std::cerr << "Unable to open output file";
+                outputFile << frame_num << ","
+                            << obj.label << "," << obj.prob << "," 
+                            << obj.rect.x << "," << obj.rect.y << "," 
+                            << obj.rect.width << "," << obj.rect.height << "\n";
             }
+
+            auto end = std::chrono::system_clock::now();
+            auto tc = (double)std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.;
+            printf(" -- fps_infer %2.4lf Hz \t t_infer %2.4lf ms\n", 1000.0/tc, tc);
 
             // cv::imshow("result", res);
             // if (cv::waitKey(10) == 'q') {
