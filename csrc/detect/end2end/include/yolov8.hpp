@@ -51,8 +51,12 @@ YOLOv8::YOLOv8(const std::string& engine_file_path)
     file.seekg(0, std::ios::beg);
     char* trtModelStream = new char[size];
     assert(trtModelStream);
+    
     file.read(trtModelStream, size);
     file.close();
+
+    printf("loaded engine\n");
+
     initLibNvInferPlugins(&this->gLogger, "");
     this->runtime = nvinfer1::createInferRuntime(this->gLogger);
     assert(this->runtime != nullptr);

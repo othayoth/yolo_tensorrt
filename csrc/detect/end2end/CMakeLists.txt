@@ -1,16 +1,19 @@
 cmake_minimum_required(VERSION 3.1)
 
 set(CMAKE_CUDA_ARCHITECTURES 60 61 62 70 72 75 86 89 90)
-set(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)
+set(CMAKE_CUDA_COMPILER /usr/bin/nvcc)
 
 project(yolov8 LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_COMPILER /usr/bin/g++)
+
 option(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
 
 # CUDA
+#set(CUDA_TOOLKIT_ROOT_DIR /usr/local/cuda)
 find_package(CUDA REQUIRED)
 message(STATUS "CUDA Libs: \n${CUDA_LIBRARIES}\n")
 get_filename_component(CUDA_LIB_DIR ${CUDA_LIBRARIES} DIRECTORY)

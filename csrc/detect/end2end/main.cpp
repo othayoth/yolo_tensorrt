@@ -28,7 +28,10 @@ int main(int argc, char** argv)
 
     assert(argc == 3);
 
+
+    printf("creating a new instance");
     auto yolov8 = new YOLOv8(engine_file_path);
+    printf("making pipe");
     yolov8->make_pipe(true);
 
     if (IsFile(path)) 
@@ -73,9 +76,9 @@ int main(int argc, char** argv)
         std::ofstream outputFile(csv_path, std::ios::trunc);
 
         long int frame_num = 0;
-        // while (cap.read(image)) {
-        for (int i : tqdm::range(total_frames)) 
-        {   
+        while (cap.read(image)) {
+        // for (int i : tqdm::range(total_frames)) 
+        // {   
             auto start = std::chrono::system_clock::now();
 
             cap.read(image);
@@ -105,7 +108,10 @@ int main(int argc, char** argv)
 
             // cv::imshow("result", res);
             // if (cv::waitKey(10) == 'q') {
-            //     break;
+            //     break;    Encoders:
+        
+
+
             // }
         }
 
